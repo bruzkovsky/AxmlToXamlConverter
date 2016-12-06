@@ -155,6 +155,12 @@ namespace AxmlToXamlConverter
                     case "Click":
                         attribute = new XAttribute("Command", bindingString);
                         break;
+                    case "Checked":
+                        attribute = new XAttribute("Checked", bindingString);
+                        break;
+                    case "Enabled":
+                        attribute = new XAttribute("IsEnabled", bindingString);
+                        break;
                 }
 
                 if (attribute != null)
@@ -222,7 +228,7 @@ namespace AxmlToXamlConverter
             { "ImageView", "Image" },
             { "ScrollView", "ScrollView" },
             { "Button", "Button" },
-            { "CheckBox", "CheckBox" },
+            { "CheckBox", "Checkbox" },
         };
 
         /// <summary>
