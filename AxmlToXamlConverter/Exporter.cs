@@ -11,7 +11,7 @@ namespace AxmlToXamlConverter
 {
     internal class Exporter
     {
-        public Task Export(string input, string output, string @namespace, bool overwrite)
+        public Task Export(string input, string output, string @namespace, bool overwrite, bool dataContext)
         {
             if (!overwrite && File.Exists(output)) throw new InvalidOperationException("Output file already exists, you have to set /o (overwrite) or delete the file.");
 
@@ -52,9 +52,18 @@ namespace AxmlToXamlConverter
             (
                 FormsNamespace + "ContentPage",
                 new XAttribute(XNamespace.Xmlns + "x", XamlNamespace),
-                new XAttribute(XamlNamespace + "Class", $"{@namespace}.{Path.GetFileNameWithoutExtension(output)}"),
-                newElement
+                new XAttribute(XamlNamespace + "Class", $"{@namespace}.{Path.GetFileNameWithoutExtension(output)}")
             );
+
+            if (dataContext)
+            {
+                page.Add(new XAttribute(XNamespace.Xmlns + "d", BlendNameSpace));
+                page.Add(new XAttribute(XNamespace.Xmlns + "mc", MarkupNamespace));
+                page.Add(new XAttribute(XNamespace.Xmlns + "vm", "clr-namespace:vmNamespace;assembly={assembly}"));
+                page.Add(new XAttribute(BlendNameSpace + "DataContext", "{d:DesignInstance vm:vmName}"));
+            }
+
+            page.Add(newElement);
             outDocument.AddFirst(page);
 
             // write document to output file
@@ -68,6 +77,10 @@ namespace AxmlToXamlConverter
         public XNamespace FormsNamespace { get; } = XNamespace.Get("http://xamarin.com/schemas/2014/forms");
 
         public XNamespace XamlNamespace { get; } = XNamespace.Get("http://schemas.microsoft.com/winfx/2009/xaml");
+
+        public XNamespace BlendNameSpace { get; } = XNamespace.Get("http://schemas.microsoft.com/expression/blend/2008");
+
+        public XNamespace MarkupNamespace { get; } = XNamespace.Get("http://schemas.openxmlformats.org/markup-compatibility/2006");
 
         private void CreateChildren(XContainer parent, XElement newParent)
         {
@@ -173,7 +186,7 @@ namespace AxmlToXamlConverter
         private void ApplyPadding(XElement to, XElement from)
         {
             var localName = to.Name.LocalName;
-            if (localName == "Label" || localName == "ListView") return;
+            if (localName == "Label" || localName == "ListView" || localName == "Checkbox" || localName == "Button" || localName == "Image") return;
 
             var padding = from.Attributes().FirstOrDefault(a => a.Name.LocalName == "padding");
             if (padding != null)

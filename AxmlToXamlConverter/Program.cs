@@ -21,6 +21,9 @@ namespace AxmlToXamlConverter
             [Option('x', "overwrite", HelpText = "flag to overwrite existing output file", Required = false)]
             public bool Overwrite { get; set; }
 
+            [Option('d', "datacontext", HelpText = "flag for intellisense binding support", Required = false)]
+            public bool DataContext { get; set; }
+
             [HelpOption]
             public string GetUsage()
             {
@@ -46,7 +49,7 @@ namespace AxmlToXamlConverter
 
                 try
                 {
-                    exporter.Export(options.Input, options.Output, options.Namespace, options.Overwrite).Wait();
+                    exporter.Export(options.Input, options.Output, options.Namespace, options.Overwrite, options.DataContext).Wait();
                 }
                 catch (InvalidOperationException e)
                 {
