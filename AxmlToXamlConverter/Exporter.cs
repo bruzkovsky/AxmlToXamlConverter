@@ -61,6 +61,7 @@ namespace AxmlToXamlConverter
                 page.Add(new XAttribute(XNamespace.Xmlns + "mc", MarkupNamespace));
                 page.Add(new XAttribute(XNamespace.Xmlns + "vm", "clr-namespace:vmNamespace;assembly={assembly}"));
                 page.Add(new XAttribute(BlendNameSpace + "DataContext", "{d:DesignInstance vm:vmName}"));
+                page.Add(new XAttribute(MarkupNamespace + "Ignorable", "d"));
             }
 
             page.Add(newElement);
