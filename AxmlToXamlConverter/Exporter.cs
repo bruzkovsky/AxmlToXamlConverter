@@ -102,8 +102,11 @@ namespace AxmlToXamlConverter
             foreach (var attribute in child.Attributes())
             {
                 Func<XElement, string, XAttribute> attributeResolver;
-                if (AttributeMap.TryGetValue(attribute.Name.LocalName, out attributeResolver))
-                    element.Add(attributeResolver(child, attribute.Value));
+
+                if (!AttributeMap.TryGetValue(attribute.Name.LocalName, out attributeResolver)) continue;
+                var resolvedAttribute = attributeResolver(child, attribute.Value);
+                if (resolvedAttribute != null)
+                    element.Add(resolvedAttribute);
             }
             ApplyPadding(element, child);
             ApplyMargin(element, child);
@@ -260,7 +263,7 @@ namespace AxmlToXamlConverter
                         case "match_parent":
                             return new XAttribute("HorizontalOptions", "FillAndExpand");
                         case "wrap_content":
-                            return new XAttribute("HorizontalOptions", "Fill");
+                            return null;
                         case "0":
                         case "0dp":
                             return e.Attributes().Any(a => a.Name.LocalName == "layout_weight")
@@ -279,7 +282,7 @@ namespace AxmlToXamlConverter
                         case "match_parent":
                             return new XAttribute("VerticalOptions", "FillAndExpand");
                         case "wrap_content":
-                            return new XAttribute("VerticalOptions", "Fill");
+                            return null;
                         case "0":
                         case "0dp":
                             return e.Attributes().Any(a => a.Name.LocalName == "layout_weight")
